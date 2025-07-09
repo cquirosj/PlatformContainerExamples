@@ -5,7 +5,7 @@ using Messages;
 var endpointConfiguration = new EndpointConfiguration("Sales");
 
 // Configure RabbitMQ transport
-var transport = new RabbitMQTransport(RoutingTopology.Conventional, "host=localhost");
+var transport = new RabbitMQTransport(RoutingTopology.Conventional, "host=localhost;username=guest;password=guest");
 endpointConfiguration.UseTransport(transport);
 
 // Configure routing
