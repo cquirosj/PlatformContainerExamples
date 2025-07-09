@@ -1,0 +1,23 @@
+transport:
+  # Connection string to connect to RabbitMQ running in Docker Compose
+  # Using host.docker.internal to access the host machine from Kubernetes pods in Docker Desktop
+  connectionString: "host=host.docker.internal:5672"
+  # The broker type, see https://docs.particular.net/servicecontrol/transports
+  type: "RabbitMQ.QuorumConventionalRouting"
+
+# RavenDB URL pointing to the Docker Compose instance
+# Using host.docker.internal to access the host machine from Kubernetes pods in Docker Desktop
+ravenDBUrl: "http://host.docker.internal:8080"
+
+pulse:
+  service:
+    # Using ClusterIP instead of LoadBalancer for Docker Desktop with nginx ingress controller
+    type: "ClusterIP"
+  
+  # Enable ingress to access ServicePulse externally through nginx controller
+  ingress:
+    create: true
+    className: "nginx"
+    host: "servicepulse.local"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /

@@ -1,0 +1,89 @@
+name: service-platform-infrastructure
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      start_interval: 10s
+      retries: 3
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  # RavenDB for Sales audit instance
+  ravendb-sales:
+    image: particular/servicecontrol-ravendb:latest
+    ports:
+      - "8081:8080"
+    volumes:
+      - raven-sales-config:/var/lib/ravendb/config
+      - raven-sales-data:/var/lib/ravendb/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/admin/stats"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # RavenDB for Marketing audit instance
+  ravendb-marketing:
+    image: particular/servicecontrol-ravendb:latest
+    ports:
+      - "8082:8080"
+    volumes:
+      - raven-marketing-config:/var/lib/ravendb/config
+      - raven-marketing-data:/var/lib/ravendb/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/admin/stats"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # RavenDB for Support audit instance
+  ravendb-support:
+    image: particular/servicecontrol-ravendb:latest
+    ports:
+      - "8083:8080"
+    volumes:
+      - raven-support-config:/var/lib/ravendb/config
+      - raven-support-data:/var/lib/ravendb/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/admin/stats"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # RavenDB for ServiceControl Error instance
+  ravendb-error:
+    image: particular/servicecontrol-ravendb:latest
+    ports:
+      - "8084:8080"
+    volumes:
+      - raven-error-config:/var/lib/ravendb/config
+      - raven-error-data:/var/lib/ravendb/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/admin/stats"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  rabbitmq-data:
+  raven-sales-config:
+  raven-sales-data:
+  raven-marketing-config:
+  raven-marketing-data:
+  raven-support-config:
+  raven-support-data:
+  raven-error-config:
+  raven-error-data:
