@@ -3,6 +3,7 @@ name: service-platform-single-audit
 services:
   rabbitmq:
     image: rabbitmq:3-management
+    env_file: .env
     ports:
       - "5672:5672"
       - "15672:15672"
