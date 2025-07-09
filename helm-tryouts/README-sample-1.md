@@ -46,7 +46,7 @@ cd ../helm
 echo "127.0.0.1 servicepulse.local" | sudo tee -a /etc/hosts
 
 # Deploy using the single-audit configuration
-helm install particular-platform --create-namespace --namespace particular-platform -f overrides-sample-1.yaml .
+helm install particular-platform --create-namespace --namespace particular-platform -f ../helm-tryouts/overrides-sample-1.yaml .
 ```
 
 ### 4. Verify Deployment
