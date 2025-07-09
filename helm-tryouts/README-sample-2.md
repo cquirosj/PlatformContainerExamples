@@ -85,7 +85,7 @@ The Error instance automatically aggregates data from all three audit instances 
 
 ## Sample NServiceBus Endpoints
 
-A complete sample application demonstrating this multi-audit pattern is available in the [`sample-endpoints`](sample-endpoints/) folder. The sample includes:
+A complete sample application demonstrating this multi-audit pattern is available in the [`sample-2-endpoints`](sample-2-endpoints/) folder. The sample includes:
 
 ### Endpoints
 - **Sales Endpoint**: Handles order placement and buyers remorse policies
@@ -110,11 +110,11 @@ cd ../helm
 helm install particular-platform-multi --create-namespace --namespace particular-platform-multi -f ../helm-tryouts/overrides-sample-2.yaml .
 
 # Run sample endpoints
-cd ../helm-tryouts/sample-endpoints
+cd ../helm-tryouts/sample-2-endpoints
 dotnet run --project RetailDemo.sln
 ```
 
-See the [sample endpoints README](sample-endpoints/README.md) for detailed instructions.
+See the [sample endpoints README](sample-2-endpoints/README.md) for detailed instructions.
 
 ## Architecture Overview
 

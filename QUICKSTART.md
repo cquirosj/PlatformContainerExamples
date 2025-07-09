@@ -125,8 +125,11 @@ cd ..
 To see the platform in action, run the sample NServiceBus endpoints:
 
 ```bash
-# Navigate to sample endpoints
-cd helm-tryouts/sample-endpoints
+# Navigate to sample endpoints for Sample 1
+cd helm-tryouts/sample-1-endpoints
+
+# Or for Sample 2
+cd helm-tryouts/sample-2-endpoints
 
 # Build the solution
 dotnet build

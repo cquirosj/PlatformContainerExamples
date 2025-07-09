@@ -13,10 +13,14 @@ This folder contains sample configurations and examples showing how to use the P
 - **`README-sample-2.md`**: Detailed guide for multiple audit instances setup
 
 ### Sample Applications
-- **`sample-endpoints/`**: Complete NServiceBus solution demonstrating both scenarios
-  - Sales, Billing, Shipping, and ClientUI endpoints
-  - Platform Connector integration
-  - Domain-specific audit queues
+- **`sample-1-endpoints/`**: Simple NServiceBus solution for single audit scenario
+  - All endpoints use default audit queue
+  - Simplified Platform Connector configuration
+  - Shared audit data in single RavenDB
+- **`sample-2-endpoints/`**: Complex NServiceBus solution for multi-audit scenario  
+  - Domain-specific audit queues (sales.audit, billing.audit, shipping.audit)
+  - Advanced Platform Connector configuration
+  - Separate audit data storage per domain
 
 ## Quick Start
 
@@ -58,10 +62,18 @@ These samples require:
 
 ## Sample Endpoints
 
-The `sample-endpoints/` folder contains a complete working example:
-- NServiceBus endpoints using Platform Connector
-- Business logic for order processing workflow
-- Error handling and saga patterns
-- Configuration for both single and multi-audit scenarios
+### Sample 1 Endpoints (`sample-1-endpoints/`)
+Simple configuration for single audit scenario:
+- All endpoints use default audit queue
+- Simplified Platform Connector setup
+- Shared audit data storage
 
-See [sample-endpoints/README.md](sample-endpoints/README.md) for details.
+See [sample-1-endpoints/README.md](sample-1-endpoints/README.md) for details.
+
+### Sample 2 Endpoints (`sample-2-endpoints/`)
+Advanced configuration for multi-audit scenario:
+- Domain-specific audit queues
+- Complex Platform Connector configuration  
+- Separated audit data per business domain
+
+See [sample-2-endpoints/README.md](sample-2-endpoints/README.md) for details.

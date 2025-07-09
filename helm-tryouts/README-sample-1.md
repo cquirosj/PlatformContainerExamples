@@ -74,7 +74,7 @@ ServicePulse will be available at: `http://servicepulse.local`
 
 ## Sample NServiceBus Endpoints
 
-A complete sample application demonstrating this single-audit pattern is available in the [`sample-endpoints`](sample-endpoints/) folder. The sample includes:
+A complete sample application demonstrating this single-audit pattern is available in the [`sample-1-endpoints`](sample-1-endpoints/) folder. The sample includes:
 
 ### Endpoints
 - **Sales Endpoint**: Handles order placement and buyers remorse policies
@@ -99,11 +99,11 @@ cd ../helm
 helm install particular-platform --create-namespace --namespace particular-platform -f ../helm-tryouts/overrides-sample-1.yaml .
 
 # Run sample endpoints
-cd ../helm-tryouts/sample-endpoints
+cd ../helm-tryouts/sample-1-endpoints
 dotnet run --project RetailDemo.sln
 ```
 
-See the [sample endpoints README](sample-endpoints/README.md) for detailed instructions.
+See the [sample endpoints README](sample-1-endpoints/README.md) for detailed instructions.
 
 ## Architecture Overview
 
