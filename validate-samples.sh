@@ -100,14 +100,14 @@ case $1 in
     sample1)
         echo "Validating Sample 1: Single Audit Instance"
         echo "Infrastructure file: docker-compose/compose-single-audit.yml"
-        echo "Helm overrides: helm/overrides-sample-1.yaml"
+        echo "Helm overrides: helm-tryouts/overrides-sample-1.yaml"
         validate_infrastructure "Single Audit"
         validate_kubernetes
         ;;
     sample2)
         echo "Validating Sample 2: Multiple Audit Instances"
         echo "Infrastructure file: docker-compose/compose-infrastructure.yml"
-        echo "Helm overrides: helm/overrides-sample-2.yaml"
+        echo "Helm overrides: helm-tryouts/overrides-sample-2.yaml"
         validate_infrastructure "Multi-Audit"
         validate_kubernetes
         ;;
@@ -123,5 +123,5 @@ echo "=== Validation Complete ==="
 echo ""
 echo "Next steps:"
 echo "1. Access ServicePulse at http://servicepulse.local (add to /etc/hosts: 127.0.0.1 servicepulse.local)"
-echo "2. Run the sample NServiceBus endpoints in sample-endpoints/ directory"
+echo "2. Run the sample NServiceBus endpoints in helm-tryouts/sample-endpoints/ directory"
 echo "3. Generate some traffic to see monitoring data"

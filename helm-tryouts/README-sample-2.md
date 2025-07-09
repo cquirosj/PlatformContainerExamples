@@ -52,7 +52,7 @@ cd ../helm
 echo "127.0.0.1 servicepulse-multi.local" | sudo tee -a /etc/hosts
 
 # Deploy using the multi-audit configuration
-helm install particular-platform-multi --create-namespace --namespace particular-platform-multi -f overrides-sample-2.yaml .
+helm install particular-platform-multi --create-namespace --namespace particular-platform-multi -f ../helm-tryouts/overrides-sample-2.yaml .
 ```
 
 ### 4. Verify Deployment
@@ -85,7 +85,7 @@ The Error instance automatically aggregates data from all three audit instances 
 
 ## Sample NServiceBus Endpoints
 
-A complete sample application demonstrating this multi-audit pattern is available in the [`sample-endpoints`](../sample-endpoints/) folder. The sample includes:
+A complete sample application demonstrating this multi-audit pattern is available in the [`sample-endpoints`](sample-endpoints/) folder. The sample includes:
 
 ### Endpoints
 - **Sales Endpoint**: Handles order placement and buyers remorse policies
@@ -107,14 +107,14 @@ docker compose -f compose-infrastructure.yml up -d
 
 # Deploy platform
 cd ../helm  
-helm install particular-platform-multi --create-namespace --namespace particular-platform-multi -f overrides-sample-2.yaml .
+helm install particular-platform-multi --create-namespace --namespace particular-platform-multi -f ../helm-tryouts/overrides-sample-2.yaml .
 
 # Run sample endpoints
-cd ../sample-endpoints
+cd ../helm-tryouts/sample-endpoints
 dotnet run --project RetailDemo.sln
 ```
 
-See the [sample endpoints README](../sample-endpoints/README.md) for detailed instructions.
+See the [sample endpoints README](sample-endpoints/README.md) for detailed instructions.
 
 ## Architecture Overview
 

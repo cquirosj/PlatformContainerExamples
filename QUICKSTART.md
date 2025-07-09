@@ -34,7 +34,7 @@ docker compose -f compose-single-audit.yml ps
 cd ../helm
 
 # Install the Helm chart with sample 1 configuration
-helm install particular-platform --create-namespace --namespace particular-platform -f overrides-sample-1.yaml .
+helm install particular-platform --create-namespace --namespace particular-platform -f ../helm-tryouts/overrides-sample-1.yaml .
 
 # Wait for pods to be ready
 kubectl wait --for=condition=ready pod --all -n particular-platform --timeout=300s
@@ -87,7 +87,7 @@ docker compose -f compose-infrastructure.yml ps
 cd ../helm
 
 # Install the Helm chart with sample 2 configuration
-helm install particular-platform --create-namespace --namespace particular-platform -f overrides-sample-2.yaml .
+helm install particular-platform --create-namespace --namespace particular-platform -f ../helm-tryouts/overrides-sample-2.yaml .
 
 # Wait for pods to be ready
 kubectl wait --for=condition=ready pod --all -n particular-platform --timeout=300s
@@ -126,7 +126,7 @@ To see the platform in action, run the sample NServiceBus endpoints:
 
 ```bash
 # Navigate to sample endpoints
-cd sample-endpoints
+cd helm-tryouts/sample-endpoints
 
 # Build the solution
 dotnet build
@@ -188,8 +188,8 @@ docker compose -f docker-compose/compose-infrastructure.yml down
 ## Next Steps
 
 - Read the detailed documentation:
-  - [Single Audit Instance (Sample 1)](helm/README-sample-1.md)
-  - [Multiple Audit Instances (Sample 2)](helm/README-sample-2.md)
+  - [Single Audit Instance (Sample 1)](helm-tryouts/README-sample-1.md)
+  - [Multiple Audit Instances (Sample 2)](helm-tryouts/README-sample-2.md)
 - Explore the NServiceBus Platform Connector configuration in the sample endpoints
 - Adapt the configurations for your specific environment and requirements
 - Review the [Particular Platform documentation](https://docs.particular.net/platform/) for production deployment considerations
