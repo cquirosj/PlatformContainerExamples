@@ -1,0 +1,38 @@
+name: service-platform-single-audit
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      start_interval: 10s
+      retries: 3
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  # RavenDB for ServiceControl Error instance and single Audit instance
+  ravendb:
+    image: particular/servicecontrol-ravendb:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - raven-config:/var/lib/ravendb/config
+      - raven-data:/var/lib/ravendb/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/admin/stats"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+volumes:
+  rabbitmq-data:
+  raven-config:
+  raven-data:

@@ -1,6 +1,8 @@
 transport:
   # Connection string to connect to RabbitMQ running in Docker Compose
   # Using host.docker.internal to access the host machine from Kubernetes pods in Docker Desktop
+  # Start infrastructure: docker compose -f ../docker-compose/compose-single-audit.yml up -d
+  # Documentation: README-sample-1.md
   connectionString: "host=host.docker.internal:5672"
   # The broker type, see https://docs.particular.net/servicecontrol/transports
   type: "RabbitMQ.QuorumConventionalRouting"
