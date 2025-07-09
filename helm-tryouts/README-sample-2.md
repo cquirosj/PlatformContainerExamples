@@ -101,11 +101,20 @@ A complete sample application demonstrating this multi-audit pattern is availabl
 
 ### Running the Sample
 ```shell
-# Start infrastructure first
+# 1. Install nginx ingress controller (if not already installed)
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for it to be ready
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
+
+# 2. Start infrastructure first
 cd ../docker-compose
 docker compose -f compose-infrastructure.yml up -d
 
-# Deploy platform
+# 3. Deploy platform
 cd ../helm  
 helm install particular-platform-multi --create-namespace --namespace particular-platform-multi -f ../helm-tryouts/overrides-sample-2.yaml .
 
@@ -218,6 +227,118 @@ The Error instance is automatically configured with remote instances pointing to
 3. **Monitoring**: Monitor each database separately for health and performance
 4. **Scaling**: Audit instances can be scaled independently based on message volume
 5. **Security**: Consider network policies to isolate database access
+
+## Troubleshooting
+
+### nginx Ingress Controller Issues
+
+If ServicePulse is not accessible, verify the nginx ingress controller is properly installed:
+
+```shell
+# Check if nginx ingress controller is running
+kubectl get pods -n ingress-nginx
+
+# Check ingress controller service
+kubectl get services -n ingress-nginx
+
+# Install nginx ingress controller if missing
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for readiness (may take several minutes)
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
+```
+
+### ServicePulse Accessibility
+
+If you cannot access ServicePulse at `http://servicepulse.local`, try these steps:
+
+1. **Check hosts file**: Ensure `servicepulse.local` points to `127.0.0.1`:
+   ```shell
+   echo "127.0.0.1 servicepulse.local" | sudo tee -a /etc/hosts
+   ```
+
+2. **Verify ingress is created**:
+   ```shell
+   kubectl get ingress -n particular-platform-multi
+   ```
+
+3. **Check ingress status**:
+   ```shell
+   kubectl describe ingress servicepulse-ingress -n particular-platform-multi
+   ```
+
+4. **Alternative access**: Use port-forwarding if ingress issues persist:
+   ```shell
+   kubectl port-forward -n particular-platform-multi svc/particular-platform-multi-servicepulse 9090:9090
+   # Then access via http://localhost:9090
+   ```
+
+### Pod Issues
+
+If pods are not starting:
+
+1. **Check pod status**:
+   ```shell
+   kubectl get pods -n particular-platform-multi
+   ```
+
+2. **View pod logs**:
+   ```shell
+   kubectl logs -n particular-platform-multi deployment/particular-platform-multi-servicecontrol
+   kubectl logs -n particular-platform-multi deployment/particular-platform-multi-servicepulse
+   kubectl logs -n particular-platform-multi deployment/particular-platform-multi-multi-audit-sales
+   kubectl logs -n particular-platform-multi deployment/particular-platform-multi-multi-audit-billing
+   kubectl logs -n particular-platform-multi deployment/particular-platform-multi-multi-audit-shipping
+   ```
+
+3. **Check infrastructure connectivity**:
+   ```shell
+   # Verify RabbitMQ is accessible from Kubernetes
+   kubectl run test-rabbitmq --image=busybox --rm -it --restart=Never -- nc -zv host.docker.internal 5672
+   
+   # Verify RavenDB instances are accessible from Kubernetes
+   kubectl run test-ravendb-sales --image=busybox --rm -it --restart=Never -- nc -zv host.docker.internal 8081
+   kubectl run test-ravendb-billing --image=busybox --rm -it --restart=Never -- nc -zv host.docker.internal 8082
+   kubectl run test-ravendb-shipping --image=busybox --rm -it --restart=Never -- nc -zv host.docker.internal 8083
+   kubectl run test-ravendb-error --image=busybox --rm -it --restart=Never -- nc -zv host.docker.internal 8084
+   ```
+
+### Multiple Audit Specific Issues
+
+1. **Remote instance configuration**: If audit instances are not showing in ServiceControl:
+   ```shell
+   # Check if audit instances are running
+   kubectl get pods -n particular-platform-multi | grep audit
+   
+   # Check audit instance logs for connectivity issues
+   kubectl logs -n particular-platform-multi deployment/particular-platform-multi-multi-audit-sales
+   ```
+
+2. **Database separation**: Verify each audit instance is connected to its own database:
+   ```shell
+   # Check RavenDB management UIs
+   open http://localhost:8081  # Sales
+   open http://localhost:8082  # Billing  
+   open http://localhost:8083  # Shipping
+   open http://localhost:8084  # Error
+   ```
+
+### Resource Issues
+
+If pods are pending or being evicted:
+
+1. **Check node resources**:
+   ```shell
+   kubectl top nodes
+   kubectl describe nodes
+   ```
+
+2. **Check resource requests in overrides-sample-2.yaml** and adjust if needed
+
+3. **Check Docker Desktop resources** in settings and increase if necessary (this setup requires more resources than Sample 1)
 
 ## Cleanup
 

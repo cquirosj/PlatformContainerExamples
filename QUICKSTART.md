@@ -10,6 +10,26 @@ This guide provides step-by-step instructions for running the Particular Service
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (for running sample endpoints)
 
+### Setup nginx Ingress Controller
+
+**Important:** The samples require nginx ingress controller to access ServicePulse. Install it first:
+
+```bash
+# Install nginx ingress controller for Docker Desktop
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for it to be ready (this may take a few minutes)
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
+
+# Verify installation
+kubectl get services -n ingress-nginx
+```
+
+You should see the ingress-nginx-controller service running.
+
 ## Sample 1: Single Audit Instance
 
 This sample demonstrates a simple setup with one audit instance using a single RavenDB for both error and audit data.

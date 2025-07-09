@@ -90,11 +90,20 @@ A complete sample application demonstrating this single-audit pattern is availab
 
 ### Running the Sample
 ```shell
-# Start infrastructure first
+# 1. Install nginx ingress controller (if not already installed)
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for it to be ready
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
+
+# 2. Start infrastructure first
 cd ../docker-compose
 docker compose -f compose-single-audit.yml up -d
 
-# Deploy platform
+# 3. Deploy platform
 cd ../helm  
 helm install particular-platform --create-namespace --namespace particular-platform -f ../helm-tryouts/overrides-sample-1.yaml .
 
@@ -233,6 +242,93 @@ This single audit setup provides an easy migration path to multiple audit instan
 2. **Monitor Growth**: Track message volume and database size
 3. **Plan Separation**: Identify business domains that would benefit from separation
 4. **Gradual Migration**: Move to multiple audit instances when needed
+
+## Troubleshooting
+
+### nginx Ingress Controller Issues
+
+If ServicePulse is not accessible, verify the nginx ingress controller is properly installed:
+
+```shell
+# Check if nginx ingress controller is running
+kubectl get pods -n ingress-nginx
+
+# Check ingress controller service
+kubectl get services -n ingress-nginx
+
+# Install nginx ingress controller if missing
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for readiness (may take several minutes)
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
+```
+
+### ServicePulse Accessibility
+
+If you cannot access ServicePulse at `http://servicepulse.local`, try these steps:
+
+1. **Check hosts file**: Ensure `servicepulse.local` points to `127.0.0.1`:
+   ```shell
+   echo "127.0.0.1 servicepulse.local" | sudo tee -a /etc/hosts
+   ```
+
+2. **Verify ingress is created**:
+   ```shell
+   kubectl get ingress -n particular-platform
+   ```
+
+3. **Check ingress status**:
+   ```shell
+   kubectl describe ingress servicepulse-ingress -n particular-platform
+   ```
+
+4. **Alternative access**: Use port-forwarding if ingress issues persist:
+   ```shell
+   kubectl port-forward -n particular-platform svc/particular-platform-servicepulse 9090:9090
+   # Then access via http://localhost:9090
+   ```
+
+### Pod Issues
+
+If pods are not starting:
+
+1. **Check pod status**:
+   ```shell
+   kubectl get pods -n particular-platform
+   ```
+
+2. **View pod logs**:
+   ```shell
+   kubectl logs -n particular-platform deployment/particular-platform-servicecontrol
+   kubectl logs -n particular-platform deployment/particular-platform-servicepulse
+   kubectl logs -n particular-platform deployment/particular-platform-audit
+   ```
+
+3. **Check infrastructure connectivity**:
+   ```shell
+   # Verify RabbitMQ is accessible from Kubernetes
+   kubectl run test-rabbitmq --image=busybox --rm -it --restart=Never -- nc -zv host.docker.internal 5672
+   
+   # Verify RavenDB is accessible from Kubernetes
+   kubectl run test-ravendb --image=busybox --rm -it --restart=Never -- nc -zv host.docker.internal 8080
+   ```
+
+### Resource Issues
+
+If pods are pending or being evicted:
+
+1. **Check node resources**:
+   ```shell
+   kubectl top nodes
+   kubectl describe nodes
+   ```
+
+2. **Check resource requests in overrides-sample-1.yaml** and adjust if needed
+
+3. **Check Docker Desktop resources** in settings and increase if necessary
 
 ## Cleanup
 

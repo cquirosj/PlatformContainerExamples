@@ -44,6 +44,11 @@ docker compose -f compose-single-audit.yml up -d
 docker compose -f compose-infrastructure.yml up -d
 ```
 
+**Note:** When using these infrastructure setups with Kubernetes and Helm (see `/helm-tryouts/`), ensure nginx ingress controller is installed:
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+```
+
 Running ServiceControl and ServicePulse locally in containers provides a way to use and test Service Platform features during local development on any platform, without needing to install Windows services.
 
 ## Access Points

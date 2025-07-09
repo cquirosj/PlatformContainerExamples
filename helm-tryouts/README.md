@@ -58,7 +58,21 @@ These samples require:
 - Infrastructure services from `../docker-compose/`
 - The Helm chart from `../helm/`
 - Kubernetes cluster (Docker Desktop with Kubernetes enabled)
-- nginx ingress controller
+- **nginx ingress controller** (required for ServicePulse access)
+
+### Installing nginx Ingress Controller
+
+The samples use nginx ingress to expose ServicePulse. Install it in your Docker Desktop Kubernetes cluster:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for readiness
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
+```
 
 ## Sample Endpoints
 

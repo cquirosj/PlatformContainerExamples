@@ -1,6 +1,26 @@
 # Platform Container Examples
 
-This repository contains examples of deploying the [Particular Service Platform](https://docs.particular.net/platform/) tools (notably [ServiceControl](https://docs.particular.net/servicecontrol/) and [ServicePulse](https://docs.particular.net/servicepulse/)) using containers. These examples can be used as starting points for deployment scripts, or as a tool to learn how the different pieces work together, but should not be used as-is in production environments.
+## Prerequisites
+
+- [Docker Desktop](https://docs.docker.com/get-docker/) with Kubernetes enabled
+- [Helm](https://helm.sh/docs/intro/install/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (for running sample endpoints)
+- **nginx Ingress Controller** for Kubernetes (required for accessing ServicePulse)
+
+### Installing nginx Ingress Controller
+
+The samples use nginx ingress to expose ServicePulse externally. Install it in your Docker Desktop Kubernetes cluster:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+```
+
+Verify the installation:
+```bash
+kubectl get pods -n ingress-nginx
+kubectl get services -n ingress-nginx
+```
 
 ## 🚀 Quick Start
 

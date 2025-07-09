@@ -10,8 +10,25 @@ In order to use the particular-platform chart, you need the following infrastruc
 
 1. A RavenDB server (see below for instructions)
 2. A broker connection string
+3. **nginx Ingress Controller** (required for ServicePulse external access)
 
 We recommend install raven using our container [`particular/servicecontrol-ravendb`](https://hub.docker.com/r/particular/servicecontrol-ravendb).
+
+### Installing nginx Ingress Controller
+
+The chart uses nginx ingress to expose ServicePulse externally. For Docker Desktop Kubernetes, install it with:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+
+# Wait for readiness
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
+```
+
+For other Kubernetes environments, see the [nginx Ingress Controller installation guide](https://kubernetes.github.io/ingress-nginx/deploy/).
 
 ## Installing the Chart
 
