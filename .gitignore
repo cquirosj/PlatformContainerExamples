@@ -6,13 +6,16 @@ obj/
 *.cache
 *.docstates
 
-# Visual Studio / VS Code
-.vscode/
-.vs/
+# Visual Studio / VS Code / Rider - Keep IDE folders but ignore their contents
+.vscode/*
+!.vscode/
+.vs/*
+!.vs/
 *.userprefs
 
-# Rider
-.idea/
+# Rider - Keep IDE folder but ignore its contents
+.idea/*
+!.idea/
 
 # OS generated files
 .DS_Store
