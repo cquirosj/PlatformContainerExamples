@@ -2,7 +2,7 @@
 
 This example demonstrates how to deploy the Particular Platform with multiple audit instances, each using a dedicated RavenDB database. This pattern is useful for:
 
-- **Business Domain Separation**: Different teams (Sales, Marketing, Support) with isolated audit data
+- **Business Domain Separation**: Different teams (Sales, Billing, Shipping) with isolated audit data
 - **Different Retention Policies**: Each business domain can have its own data retention requirements
 - **Scalability**: Distribute audit load across multiple instances and databases
 - **Performance Isolation**: Heavy audit traffic from one domain won't impact others
@@ -21,8 +21,8 @@ docker compose -f compose-infrastructure.yml up -d
 This will start:
 - **RabbitMQ**: `localhost:5672` (Management UI at `localhost:15672`)
 - **RavenDB Sales**: `localhost:8081` 
-- **RavenDB Marketing**: `localhost:8082`
-- **RavenDB Support**: `localhost:8083`
+- **RavenDB Billing**: `localhost:8082`
+- **RavenDB Shipping**: `localhost:8083`
 - **RavenDB Error**: `localhost:8084`
 
 ### 2. Verify Infrastructure is Running
@@ -36,8 +36,8 @@ curl -u guest:guest http://localhost:15672/api/overview
 
 # Test RavenDB instances
 curl http://localhost:8081/admin/stats  # Sales
-curl http://localhost:8082/admin/stats  # Marketing
-curl http://localhost:8083/admin/stats  # Support
+curl http://localhost:8082/admin/stats  # Billing
+curl http://localhost:8083/admin/stats  # Shipping
 curl http://localhost:8084/admin/stats  # Error
 ```
 
@@ -72,8 +72,8 @@ You should see:
 - **1 Error instance**: `particular-platform-multi-error`
 - **3 Audit instances**: 
   - `particular-platform-multi-audit-sales`
-  - `particular-platform-multi-audit-marketing`
-  - `particular-platform-multi-audit-support`
+  - `particular-platform-multi-audit-billing`
+  - `particular-platform-multi-audit-shipping`
 - **1 Monitor instance**: `particular-platform-multi-monitor`
 - **1 ServicePulse instance**: `particular-platform-multi-pulse`
 
@@ -83,6 +83,39 @@ ServicePulse will be available at: `http://servicepulse-multi.local`
 
 The Error instance automatically aggregates data from all three audit instances through the remote instances feature.
 
+## Sample NServiceBus Endpoints
+
+A complete sample application demonstrating this multi-audit pattern is available in the [`sample-endpoints`](../sample-endpoints/) folder. The sample includes:
+
+### Endpoints
+- **Sales Endpoint**: Handles order placement and buyers remorse policies
+- **Billing Endpoint**: Processes payments and manages shipping policies  
+- **Shipping Endpoint**: Coordinates shipment with external carriers (Maple/Alpine)
+- **ClientUI**: Console application for placing orders
+
+### Key Features
+- **Platform Connector**: Each endpoint uses domain-specific audit queues
+- **Saga Workflows**: Demonstrates business process orchestration
+- **Message Flow**: Complete order lifecycle from placement to shipment
+- **Error Handling**: Timeout handling and escalation scenarios
+
+### Running the Sample
+```shell
+# Start infrastructure first
+cd ../docker-compose
+docker compose -f compose-infrastructure.yml up -d
+
+# Deploy platform
+cd ../helm  
+helm install particular-platform-multi --create-namespace --namespace particular-platform-multi -f overrides-sample-2.yaml .
+
+# Run sample endpoints
+cd ../sample-endpoints
+dotnet run --project RetailDemo.sln
+```
+
+See the [sample endpoints README](../sample-endpoints/README.md) for detailed instructions.
+
 ## Architecture Overview
 
 ```
@@ -90,7 +123,7 @@ The Error instance automatically aggregates data from all three audit instances 
 │                                Docker Host                                      │
 │                                                                                 │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
-│  │   RabbitMQ      │  │ RavenDB Sales   │  │RavenDB Marketing│  │RavenDB Supp.│ │
+│  │   RabbitMQ      │  │ RavenDB Sales   │  │ RavenDB Billing │  │RavenDB Ship.│ │
 │  │   :5672         │  │     :8081       │  │     :8082       │  │    :8083    │ │
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘  └─────────────┘ │
 │                                                                                 │
@@ -106,17 +139,17 @@ The Error instance automatically aggregates data from all three audit instances 
 │                            Kubernetes Cluster                                  │
 │                                                                                 │
 │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐             │
-│  │   Sales Team    │    │ Marketing Team  │    │  Support Team   │             │
+│  │   Sales Team    │    │ Billing Team    │    │  Shipping Team  │             │
 │  │   Endpoints     │    │   Endpoints     │    │   Endpoints     │             │
 │  └─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘             │
 │            │                      │                      │                     │
 │            ▼                      ▼                      ▼                     │
-│      sales.audit            marketing.audit        support.audit               │
-│        queue                     queue                 queue                   │
+│      sales.audit            billing.audit         shipping.audit              │
+│        queue                     queue                  queue                  │
 │            │                      │                      │                     │
 │            ▼                      ▼                      ▼                     │
 │  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐             │
-│  │ Sales Audit     │    │Marketing Audit  │    │Support Audit    │             │
+│  │ Sales Audit     │    │ Billing Audit   │    │ Shipping Audit  │             │
 │  │ Instance        │    │ Instance        │    │ Instance        │             │
 │  │ Pod :44444      │    │ Pod :44444      │    │ Pod :44444      │             │
 │  │ ↓ RavenDB:8081  │    │ ↓ RavenDB:8082  │    │ ↓ RavenDB:8083  │             │
@@ -158,14 +191,14 @@ The Error instance automatically aggregates data from all three audit instances 
 ### Queue Configuration
 Each audit instance processes messages from dedicated queues:
 - **Sales team endpoints** → `sales.audit` queue → Sales audit instance
-- **Marketing team endpoints** → `marketing.audit` queue → Marketing audit instance  
-- **Support team endpoints** → `support.audit` queue → Support audit instance
+- **Billing team endpoints** → `billing.audit` queue → Billing audit instance  
+- **Shipping team endpoints** → `shipping.audit` queue → Shipping audit instance
 
 ### Database Isolation
 Each instance uses a separate RavenDB database:
 - **Sales audit data** → RavenDB on port 8081
-- **Marketing audit data** → RavenDB on port 8082
-- **Support audit data** → RavenDB on port 8083
+- **Billing audit data** → RavenDB on port 8082
+- **Shipping audit data** → RavenDB on port 8083
 - **Error instance data** → RavenDB on port 8084
 
 ### Remote Instances Configuration
@@ -173,8 +206,8 @@ The Error instance is automatically configured with remote instances pointing to
 ```json
 [
   { "api_uri": "http://particular-platform-multi-audit-sales:44444/api" },
-  { "api_uri": "http://particular-platform-multi-audit-marketing:44444/api" },
-  { "api_uri": "http://particular-platform-multi-audit-support:44444/api" }
+  { "api_uri": "http://particular-platform-multi-audit-billing:44444/api" },
+  { "api_uri": "http://particular-platform-multi-audit-shipping:44444/api" }
 ]
 ```
 

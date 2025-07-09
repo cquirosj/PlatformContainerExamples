@@ -32,14 +32,14 @@ services:
       start_period: 30s
       retries: 3
 
-  # RavenDB for Marketing audit instance
-  ravendb-marketing:
+  # RavenDB for Billing audit instance
+  ravendb-billing:
     image: particular/servicecontrol-ravendb:latest
     ports:
       - "8082:8080"
     volumes:
-      - raven-marketing-config:/var/lib/ravendb/config
-      - raven-marketing-data:/var/lib/ravendb/data
+      - raven-billing-config:/var/lib/ravendb/config
+      - raven-billing-data:/var/lib/ravendb/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/admin/stats"]
       interval: 30s
@@ -47,14 +47,14 @@ services:
       start_period: 30s
       retries: 3
 
-  # RavenDB for Support audit instance
-  ravendb-support:
+  # RavenDB for Shipping audit instance
+  ravendb-shipping:
     image: particular/servicecontrol-ravendb:latest
     ports:
       - "8083:8080"
     volumes:
-      - raven-support-config:/var/lib/ravendb/config
-      - raven-support-data:/var/lib/ravendb/data
+      - raven-shipping-config:/var/lib/ravendb/config
+      - raven-shipping-data:/var/lib/ravendb/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/admin/stats"]
       interval: 30s
@@ -81,9 +81,9 @@ volumes:
   rabbitmq-data:
   raven-sales-config:
   raven-sales-data:
-  raven-marketing-config:
-  raven-marketing-data:
-  raven-support-config:
-  raven-support-data:
+  raven-billing-config:
+  raven-billing-data:
+  raven-shipping-config:
+  raven-shipping-data:
   raven-error-config:
   raven-error-data:
