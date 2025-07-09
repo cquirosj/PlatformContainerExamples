@@ -21,7 +21,7 @@ var routing = transport.UseConventionalRoutingTopology(QueueType.Quorum).Routing
 endpointConfiguration.UsePersistence<LearningPersistence>();
 
 endpointConfiguration.SendFailedMessagesTo("error");
-endpointConfiguration.AuditProcessedMessagesTo("audit");
+endpointConfiguration.AuditProcessedMessagesTo("sales.audit");
 
 var servicePlatformConnection = ServicePlatformConnectionConfiguration.Parse(@"{
     ""Heartbeats"": {
@@ -37,11 +37,11 @@ var servicePlatformConnection = ServicePlatformConnectionConfiguration.Parse(@"{
     ""ErrorQueue"": ""error"",
     ""SagaAudit"": {
         ""Enabled"": true,
-        ""SagaAuditQueue"": ""audit""
+        ""SagaAuditQueue"": ""sales.audit""
     },
     ""MessageAudit"": {
         ""Enabled"": true,
-        ""AuditQueue"": ""audit""
+        ""AuditQueue"": ""sales.audit""
     },
     ""Metrics"": {
         ""Enabled"": true,

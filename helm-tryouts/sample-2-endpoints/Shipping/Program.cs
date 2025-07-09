@@ -26,7 +26,7 @@ routing.RouteToEndpoint(typeof(ShipWithMaple), "Shipping");
 routing.RouteToEndpoint(typeof(ShipWithAlpine), "Shipping");
 
 endpointConfiguration.SendFailedMessagesTo("error");
-endpointConfiguration.AuditProcessedMessagesTo("audit");
+endpointConfiguration.AuditProcessedMessagesTo("shipping.audit");
 
 var servicePlatformConnection = ServicePlatformConnectionConfiguration.Parse(@"{
     ""Heartbeats"": {
@@ -42,11 +42,11 @@ var servicePlatformConnection = ServicePlatformConnectionConfiguration.Parse(@"{
     ""ErrorQueue"": ""error"",
     ""SagaAudit"": {
         ""Enabled"": true,
-        ""SagaAuditQueue"": ""audit""
+        ""SagaAuditQueue"": ""shipping.audit""
     },
     ""MessageAudit"": {
         ""Enabled"": true,
-        ""AuditQueue"": ""audit""
+        ""AuditQueue"": ""shipping.audit""
     },
     ""Metrics"": {
         ""Enabled"": true,

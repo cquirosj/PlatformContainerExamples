@@ -33,11 +33,11 @@ var servicePlatformConnection = ServicePlatformConnectionConfiguration.Parse(@"{
     ""ErrorQueue"": ""error"",
     ""SagaAudit"": {
         ""Enabled"": true,
-        ""SagaAuditQueue"": ""audit""
+        ""SagaAuditQueue"": ""billing.audit""
     },
     ""MessageAudit"": {
         ""Enabled"": true,
-        ""AuditQueue"": ""audit""
+        ""AuditQueue"": ""billing.audit""
     },
     ""Metrics"": {
         ""Enabled"": true,
@@ -51,7 +51,7 @@ endpointConfiguration.ConnectToServicePlatform(servicePlatformConnection);
 endpointConfiguration.UsePersistence<LearningPersistence>();
 
 endpointConfiguration.SendFailedMessagesTo("error");
-endpointConfiguration.AuditProcessedMessagesTo("audit");
+endpointConfiguration.AuditProcessedMessagesTo("billing.audit");
 
 // Decrease the default delayed delivery interval so that we don't
 // have to wait too long for the message to be moved to the error queue
